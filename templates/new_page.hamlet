@@ -1,0 +1,5 @@
+<li #form>
+  $maybe (s1,s2) <- text_pair
+    <dl .message>
+      <dt>#{s1}
+      <dd>#{s2}

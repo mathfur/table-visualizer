@@ -2,6 +2,7 @@
 
 module Cursor where
 
+import Prelude
 import Control.Monad.State
 import Control.Monad.Trans.Reader (ReaderT, ask)
 
