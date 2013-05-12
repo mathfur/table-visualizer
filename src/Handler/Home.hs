@@ -1,57 +1,31 @@
 {-# LANGUAGE TupleSections, OverloadedStrings #-}
+{-# OPTIONS_GHC -Wall #-}
+
 module Handler.Home where
 
 import Import
-import Database.Persist.Sqlite
 
--- This is a handler function for the GET request method on the HomeR
--- resource pattern. All of your resource patterns are defined in
--- config/routes
---
--- The majority of the code you will write in Yesod lives in these handler
--- functions. You can spread them across multiple files if you are so
--- inclined, or create a single monolithic file.
+import Tree
+import Schema
+
 getHomeR :: Handler RepHtml
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let text_pair = Just ("foo", "bar") :: Maybe (Text, Text)
-        handlerName = "postHomeR" :: Text
-        submission = Nothing :: Maybe (FileInfo, FileInfo, Text, Maybe Text)
+    let t = Branch "confs" [Branch "pages" [Node "users"]]
+    defs <- liftIO $ readTableDefsFromFile "sample_schema.rb"
+    let extend_t = extendTree defs t
     defaultLayout $ do
-        aDomId <- lift newIdent
-        setTitle "ここにタイトル"
-        $(widgetFile "homepage")
+        setTitle "title"
+        toWidget2 extend_t
+        toWidget [hamlet| Hello1411 |]
 
 postHomeR :: Handler RepHtml
 postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
-
     defaultLayout $ do
-        aDomId <- lift newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
-
-sampleForm :: Form (FileInfo, FileInfo, Text, Maybe Text)
-sampleForm = renderDivs $ (,,,)
-    <$> fileAFormReq "Choose a file"
-    <*> fileAFormReq "Choose a file2"
-    <*> areq textField "What's on the file?(A)" (Just "デフォルト値")
-    <*> aopt textField "What's on the file?(B)" Nothing
+        setTitle "title"
+        toWidget [hamlet| Hello |]
 
 getEchoR :: String -> Handler RepHtml
-getEchoR s = do
-    users <- selectUsers
-    liftIO $ print users
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let text_pair = Just ("foo", "bar") :: Maybe (Text, Text)
+getEchoR _ = do
     defaultLayout $ do
-        aDomId <- lift newIdent
-        setTitle "echoタイトル2351"
-        $(widgetFile "new_page")
-      where
-        selectUsers :: Handler [Entity User]
-        selectUsers = runDB $ rawSql "SELECT ?? FROM user" []
+        setTitle "title"
+        toWidget [hamlet| Hello |]
