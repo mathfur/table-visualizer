@@ -18,14 +18,15 @@
 <script>
 
 var width = 960,
-    height = 500;
-    font_size = 15;
+    height = 500,
+    font_size = 15,
+    text_padding = 3;
 
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
     .charge(-120)
-    .linkDistance(30)
+    .linkDistance(120)
     .size([width, height]);
 
 var svg = d3.select("body").append("svg")
@@ -52,20 +53,22 @@ d3.json("foo.json", function(error, graph) {
                                  .enter()
                                  .append("text")
                                  .attr("y", function(d, i){
-                                         return (font_size + 2) * (i+1);
+                                         return (text_padding + font_size) * (i+1);
                                  })
                                  .attr("fill", "#db0058")
                                  .attr("font-family", "impact")
                                  .attr("font-size", font_size)
                                  .text(function(d){ return d });
 
-                    var text_box_width  = d3.max(text[0].map(function(e){ return e.getBBox().width; }));
-                    var text_box_height = d3.sum(text[0].map(function(e){ return e.getBBox().height; }));
+                    var text_box_width  = d3.max(text[0].map(function(e){ return text_padding + e.getBBox().width; }));
+                    var text_box_height = d3.sum(text[0].map(function(e){ return text_padding + e.getBBox().height; }));
 
                     d3.select(this)
                       .insert("rect", "text")
                       .attr("width", function(d){  return text_box_width })
                       .attr("height", function(d){ return text_box_height })
+                      .attr("rx", 3)
+                      .attr("ry", 3)
                       .style("fill", "#b7f46b");
                  });
 

@@ -9,9 +9,16 @@ import Text.Parsec hiding ((<|>))
 import Text.Parsec.Text (Parser)
 import Text.Parsec.Expr
 import Control.Applicative hiding (many)
+import Data.Aeson
 
 data TableDef = TableDef Text [ColumnDef] deriving (Show, Eq)
 data ColumnDef = ColumnDef { colName :: Text, colType :: Text } deriving (Show, Eq)
+
+instance ToJSON TableDef where
+    toJSON (TableDef name cols) = object ["table_name" .= name, "columns" .= toJSON cols]
+
+instance ToJSON ColumnDef where
+    toJSON (ColumnDef name typ) = object ["name" .= name, "type" .= typ]
 
 readTableDefsFromFile :: FilePath -> IO [TableDef]
 readTableDefsFromFile fp = do

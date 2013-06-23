@@ -3,14 +3,17 @@
 
 module Tree where
 
-import Import hiding (Env, concat, length)
+import Import hiding (Env, concat, length, object)
 
 import Data.Text hiding (map, find, zip, maximum, tail, head, concat)
+import qualified Data.Text.Lazy as TL
+import qualified Data.Text.Lazy.Encoding as TL
 import Prelude hiding (concat, length)
 import Data.List hiding (length)
 import Control.Monad.State
 import Control.Monad.Trans.Reader (ReaderT, runReaderT)
 import Data.Char (isSpace)
+import Data.Aeson
 
 import Cursor
 import Schema
@@ -20,6 +23,10 @@ type TableName = Text
 data Tree a = Node a
           | Branch a [Tree a]
 
+instance (ToJSON a) => ToJSON (Tree a) where
+    toJSON (Branch a ts) = object ["value" .= toJSON a, "children" .= toJSON ts]
+    toJSON (Node a) = object ["value" .= toJSON a]
+
 createTableDef :: Text -> TableDef
 createTableDef t = TableDef (head ts) (map (\n -> ColumnDef n "unknown") $ tail ts)
   where
@@ -28,6 +35,9 @@ createTableDef t = TableDef (head ts) (map (\n -> ColumnDef n "unknown") $ tail 
 extendTree ::  [TableDef] -> Tree TableName -> Tree (Maybe TableDef)
 extendTree defs (Node name)      = Node $ getTableByName defs name
 extendTree defs (Branch n trees) = Branch (getTableByName defs n) $ map (extendTree defs) trees
+
+extendTreeToJSON :: [TableDef] -> Tree TableName -> TL.Text
+extendTreeToJSON defs tree = TL.decodeUtf8 $ encode $ toJSON $ extendTree defs tree
 
 getTableByName :: [TableDef] -> TableName -> Maybe TableDef
 getTableByName tables name = find (\(TableDef name' _) -> name == name') tables
@@ -96,10 +106,10 @@ nameAndColumns (TableDef n columns) = [n] ++ (map colName columns)
 
 toWidget2 :: (Drawable a) => a -> GWidget App App ()
 toWidget2 extend_t = do
-    toWidget [whamlet|<h1> Hello3|]
+    toWidget [whamlet|<h1> Table-Visualizer|]
+    toWidget [lucius|h1 { color: green } |]
     let ws = drawHamlet 0 0 extend_t
     toWidget [whamlet|<svg viewBox="0 -13 1000 1000">
              $forall w <- ws
                ^{w}
              |]
-    toWidget [lucius|h1 { color: green } |]
