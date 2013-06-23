@@ -19,6 +19,7 @@
 
 var width = 960,
     height = 500;
+    font_size = 15;
 
 var color = d3.scale.category20();
 
@@ -46,19 +47,26 @@ d3.json("foo.json", function(error, graph) {
                  .data(graph.nodes)
                  .enter().append("g")
                  .each(function(d){
-                    var text = d3.select(this)
-                      .append("text")
-                      .attr("y", 15)
-                      .attr("fill", "#f00")
-                      .text(function(d){ return d.name });
+                    var text = d3.select(this).selectAll("text")
+                                 .data([d.name, ">"].concat(d.columns))
+                                 .enter()
+                                 .append("text")
+                                 .attr("y", function(d, i){
+                                         return (font_size + 2) * (i+1);
+                                 })
+                                 .attr("fill", "#db0058")
+                                 .attr("font-family", "impact")
+                                 .attr("font-size", font_size)
+                                 .text(function(d){ return d });
 
-                    var text_box = text[0][0].getBBox(); // TODO: Refactoring
+                    var text_box_width  = d3.max(text[0].map(function(e){ return e.getBBox().width; }));
+                    var text_box_height = d3.sum(text[0].map(function(e){ return e.getBBox().height; }));
 
                     d3.select(this)
                       .insert("rect", "text")
-                      .attr("width", function(d){  return text_box.width })
-                      .attr("height", function(d){ return text_box.height })
-                      .style("fill", function(d){ return color(d.group); });
+                      .attr("width", function(d){  return text_box_width })
+                      .attr("height", function(d){ return text_box_height })
+                      .style("fill", "#b7f46b");
                  });
 
   force.on("tick", function() {

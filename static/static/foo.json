@@ -1,13 +1,11 @@
 {
   "nodes":[
-    {"name":"Myriel","group":1},
-    {"name":"Napoleon","group":1},
-    {"name":"Mlle.Baptistine","group":1},
-    {"name":"Mme.Magloire","group":1}
+    {"name":"users", "columns": ["id", "name"]},
+    {"name":"groups", "columns": ["id", "name"]},
+    {"name":"organizations", "columns": ["id", "name"]}
   ],
   "links":[
     {"source":0,"target":1,"value":1},
-    {"source":1,"target":2,"value":8},
-    {"source":2,"target":3,"value":10}
+    {"source":1,"target":2,"value":8}
   ]
 }
