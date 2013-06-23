@@ -4,19 +4,17 @@
 module Handler.Home where
 
 import Import
+import Data.Text (split, pack)
+import System.IO
 
-import Tree
-import Schema
+import Parser
 
 getHomeR :: Handler RepHtml
 getHomeR = do
-    let t = Branch "confs" [Branch "pages" [Node "users"]]
-    defs <- liftIO $ readTableDefsFromFile "sample_schema.rb"
-    let extend_t = extendTree defs t
+    ls <- liftIO $ parse <$> (split (== '\n') <$> pack <$> readFile "table_def.dot")
+    let json = toJSON $ getLinkIndexs ls
     defaultLayout $ do
-        setTitle "title"
-        toWidget2 extend_t
-        toWidget [hamlet| Hello1411 |]
+         toWidget [julius| var graph = #{json} |]
 
 postHomeR :: Handler RepHtml
 postHomeR = do

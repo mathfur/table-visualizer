@@ -3,7 +3,7 @@
 
 module Tree where
 
-import Import hiding (Env, concat, length)
+import Import hiding (Env, concat, length, object)
 
 import Data.Text hiding (map, find, zip, maximum, tail, head, concat)
 import Prelude hiding (concat, length)
@@ -96,10 +96,10 @@ nameAndColumns (TableDef n columns) = [n] ++ (map colName columns)
 
 toWidget2 :: (Drawable a) => a -> GWidget App App ()
 toWidget2 extend_t = do
-    toWidget [whamlet|<h1> Hello3|]
+    toWidget [whamlet|<h1> Table-Visualizer|]
+    toWidget [lucius|h1 { color: green } |]
     let ws = drawHamlet 0 0 extend_t
     toWidget [whamlet|<svg viewBox="0 -13 1000 1000">
              $forall w <- ws
                ^{w}
              |]
-    toWidget [lucius|h1 { color: green } |]
