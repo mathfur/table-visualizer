@@ -6,8 +6,6 @@ module Tree where
 import Import hiding (Env, concat, length, object)
 
 import Data.Text hiding (map, find, zip, maximum, tail, head, concat)
-import qualified Data.Text.Lazy as TL
-import qualified Data.Text.Lazy.Encoding as TL
 import Prelude hiding (concat, length)
 import Data.List hiding (length)
 import Control.Monad.State
@@ -36,8 +34,8 @@ extendTree ::  [TableDef] -> Tree TableName -> Tree (Maybe TableDef)
 extendTree defs (Node name)      = Node $ getTableByName defs name
 extendTree defs (Branch n trees) = Branch (getTableByName defs n) $ map (extendTree defs) trees
 
-extendTreeToJSON :: [TableDef] -> Tree TableName -> TL.Text
-extendTreeToJSON defs tree = TL.decodeUtf8 $ encode $ toJSON $ extendTree defs tree
+extendTreeToJSON :: [TableDef] -> Tree TableName -> Value
+extendTreeToJSON defs tree = toJSON $ extendTree defs tree
 
 getTableByName :: [TableDef] -> TableName -> Maybe TableDef
 getTableByName tables name = find (\(TableDef name' _) -> name == name') tables

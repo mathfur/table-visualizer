@@ -12,10 +12,9 @@ getHomeR :: Handler RepHtml
 getHomeR = do
     let t = Branch "confs" [Branch "pages" [Node "users"]]
     defs <- liftIO $ readTableDefsFromFile "sample_schema.rb"
-    let extend_t_json = extendTreeToJSON defs t
     defaultLayout $ do
         setTitle "title"
-        toWidget [julius| var foo = #{extend_t_json}; alert("foo") |]
+        toWidget [julius| var foo = #{extendTreeToJSON defs t}; alert("foo") |]
         toWidget [hamlet| <h1> Hello |]
 
 postHomeR :: Handler RepHtml
