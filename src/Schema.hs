@@ -11,11 +11,11 @@ import Text.Parsec.Expr
 import Control.Applicative hiding (many)
 import Data.Aeson
 
-data TableDef = TableDef Text [ColumnDef] deriving (Show, Eq)
+data TableDef = TableDef { table_name :: Text, columns :: [ColumnDef]} deriving (Show, Eq)
 data ColumnDef = ColumnDef { colName :: Text, colType :: Text } deriving (Show, Eq)
 
 instance ToJSON TableDef where
-    toJSON (TableDef name cols) = object ["table_name" .= name, "columns" .= toJSON cols]
+    toJSON (TableDef name cols) = object ["name" .= name, "columns" .= toJSON cols]
 
 instance ToJSON ColumnDef where
     toJSON (ColumnDef name typ) = object ["name" .= name, "type" .= typ]

@@ -33,14 +33,14 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("foo.json", function(error, graph) {
+d3.json("http://localhost:3000/", function(error, graph) {
   force
       .nodes(graph.nodes)
-      .links(graph.links)
+      .links(graph.links || [])
       .start();
 
   var link = svg.selectAll(".link")
-      .data(graph.links)
+      .data(graph.links || [])
     .enter().append("line")
       .attr("class", "link");
 

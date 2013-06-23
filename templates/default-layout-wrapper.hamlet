@@ -1,46 +1,76 @@
-$newline never
 \<!doctype html>
-\<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
-\<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
-\<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
-\<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en"> <!--<![endif]-->
-    <head>
-        <meta charset="UTF-8">
+<meta charset="utf-8">
+<style>
+  .node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+  }
 
-        <title>#{pageTitle pc}
-        <meta name="description" content="">
-        <meta name="author" content="">
+  .link {
+    stroke: #999;
+    stroke-opacity: .6;
+  }
 
-        <meta name="viewport" content="width=device-width,initial-scale=1">
+<body>
+  <script src="http://d3js.org/d3.v3.min.js">
+  ^{pageBody pc}
+  <script>
+    var width = 960,
+        height = 500,
+        font_size = 15,
+        text_padding = 3;
 
-        ^{pageHead pc}
+    var color = d3.scale.category20();
 
-        \<!--[if lt IE 9]>
-        \<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        \<![endif]-->
+    var force = d3.layout.force()
+        .charge(-120)
+        .linkDistance(120)
+        .size([width, height]);
 
-        <script>
-          document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/,'js');
-    <body>
-        <div class="container">
-            <header>
-            <div id="main" role="main">
-              ^{pageBody pc}
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-        $maybe analytics <- extraAnalytics $ appExtra $ settings master
-            <script>
-              if(!window.location.href.match(/localhost/)){
-                window._gaq = [['_setAccount','#{analytics}'],['_trackPageview'],['_trackPageLoadTime']];
-                (function() {
-                \  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-                \  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-                \  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-                })();
-              }
-        \<!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.  chromium.org/developers/how-tos/chrome-frame-getting-started -->
-        \<!--[if lt IE 7 ]>
-            <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js">
-            <script>
-                window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})
-        \<![endif]-->
+    console.log(graph.nodes);
+    console.log(graph.links || []);
+
+    force.nodes(graph.nodes).links(graph.links || []).start();
+
+    var link = svg.selectAll(".link").data(graph.links || []).enter().append("line").attr("class", "link");
+
+    var group = svg.selectAll(".group")
+                   .data(graph.nodes)
+                   .enter().append("g")
+                   .each(function(d){
+                      var text = d3.select(this).selectAll("text")
+                                   .data([d.name, ">"].concat(d.columns.map(function(e){ return e.name + " :: " + e.type })))
+                                   .enter()
+                                   .append("text")
+                                   .attr("y", function(d, i){
+                                           return (text_padding + font_size) * (i+1);
+                                   })
+                                   .attr("fill", "#db0058")
+                                   .attr("font-family", "impact")
+                                   .attr("font-size", font_size)
+                                   .text(function(d){ return d });
+
+                      var text_box_width  = d3.max(text[0].map(function(e){ return text_padding + e.getBBox().width; }));
+                      var text_box_height = d3.sum(text[0].map(function(e){ return text_padding + e.getBBox().height; }));
+
+                      d3.select(this)
+                        .insert("rect", "text")
+                        .attr("width", function(d){  return text_box_width })
+                        .attr("height", function(d){ return text_box_height })
+                        .attr("rx", 3)
+                        .attr("ry", 3)
+                        .style("fill", "#b7f46b");
+                   });
+
+    force.on("tick", function() {
+      link.attr("x1", function(d) { return d.source.x; })
+          .attr("y1", function(d) { return d.source.y; })
+          .attr("x2", function(d) { return d.target.x; })
+          .attr("y2", function(d) { return d.target.y; });
+
+      group.attr("transform", function(d) { return "translate(" + d.x + ", " + d.y + ")"; });
+    });

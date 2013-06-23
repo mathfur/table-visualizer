@@ -11,7 +11,6 @@ import Data.List hiding (length)
 import Control.Monad.State
 import Control.Monad.Trans.Reader (ReaderT, runReaderT)
 import Data.Char (isSpace)
-import Data.Aeson
 
 import Cursor
 import Schema
@@ -21,10 +20,6 @@ type TableName = Text
 data Tree a = Node a
           | Branch a [Tree a]
 
-instance (ToJSON a) => ToJSON (Tree a) where
-    toJSON (Branch a ts) = object ["value" .= toJSON a, "children" .= toJSON ts]
-    toJSON (Node a) = object ["value" .= toJSON a]
-
 createTableDef :: Text -> TableDef
 createTableDef t = TableDef (head ts) (map (\n -> ColumnDef n "unknown") $ tail ts)
   where
@@ -33,9 +28,6 @@ createTableDef t = TableDef (head ts) (map (\n -> ColumnDef n "unknown") $ tail 
 extendTree ::  [TableDef] -> Tree TableName -> Tree (Maybe TableDef)
 extendTree defs (Node name)      = Node $ getTableByName defs name
 extendTree defs (Branch n trees) = Branch (getTableByName defs n) $ map (extendTree defs) trees
-
-extendTreeToJSON :: [TableDef] -> Tree TableName -> Value
-extendTreeToJSON defs tree = toJSON $ extendTree defs tree
 
 getTableByName :: [TableDef] -> TableName -> Maybe TableDef
 getTableByName tables name = find (\(TableDef name' _) -> name == name') tables
