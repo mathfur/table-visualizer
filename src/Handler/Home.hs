@@ -6,17 +6,20 @@ module Handler.Home where
 import Import
 import Data.Maybe
 import Data.List
+import Data.Text (split, pack, unpack)
+import System.IO
 
 import Schema
+import Parser
 
 getHomeR :: Handler RepHtml
 getHomeR = do
     let links = [("pages", "users"), ("users", "confs")]
-    defs <- liftIO $ readTableDefsFromFile "sample_schema.rb"
-    let table_names = map table_name defs
-    let links' = catMaybes $ (convertTableNameToIndex table_names) <$> links
+    lines <- liftIO $ (parse . map unpack) <$> (split (== '\n') <$> pack <$> readFile "table_def.dot")
+    let table_names = getTableNames lines
+    let links' = catMaybes $ (convertTableNameToIndex $ map pack table_names) <$> links
     let links'' = map (\(src, dst) -> object ["source" .= src, "target" .= dst]) links'
-    let json = object ["nodes" .= toJSON defs, "links" .= toJSON links'' ]
+    let json = object ["nodes" .= toJSON table_names, "links" .= toJSON links'' ]
     defaultLayout $ do
          toWidget [julius| var graph = #{json} |]
 

@@ -43,13 +43,13 @@
                    .enter().append("g")
                    .each(function(d){
                       var text = d3.select(this).selectAll("text")
-                                   .data([d.name, ">"].concat(d.columns.map(function(e){ return e.name + " :: " + e.type })))
+                                   .data(d) //[d.name, ">"].concat(d.columns.map(function(e){ return e.name + " :: " + e.type })))
                                    .enter()
                                    .append("text")
                                    .attr("y", function(d, i){
                                            return (text_padding + font_size) * (i+1);
                                    })
-                                   .attr("fill", "#db0058")
+                                   .attr("fill", "#000")
                                    .attr("font-family", "impact")
                                    .attr("font-size", font_size)
                                    .text(function(d){ return d });
@@ -63,7 +63,7 @@
                         .attr("height", function(d){ return text_box_height })
                         .attr("rx", 3)
                         .attr("ry", 3)
-                        .style("fill", "#b7f46b");
+                        .style("fill", "#aaa");
                    });
 
     force.on("tick", function() {
