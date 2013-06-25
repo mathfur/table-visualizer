@@ -43,7 +43,7 @@
                    .enter().append("g")
                    .each(function(d){
                       var text = d3.select(this).selectAll("text")
-                                   .data(d) //[d.name, ">"].concat(d.columns.map(function(e){ return e.name + " :: " + e.type })))
+                                   .data([d.name, ">"].concat(d.columns.map(function(e){ return e.name + " :: " + e.type })))
                                    .enter()
                                    .append("text")
                                    .attr("y", function(d, i){
