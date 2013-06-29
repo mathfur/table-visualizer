@@ -12,6 +12,7 @@
   }
 
 <body>
-  <script src="http://d3js.org/d3.v3.min.js">
+  <input type="text" id="node-filter"/>
+  <script src="/static/static/js/d3.v3.min.js">
   ^{pageBody pc}
   <script src="/static/static/js/class_diagram.js">
