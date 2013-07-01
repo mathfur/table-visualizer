@@ -10,4 +10,4 @@ config/client_session_key.aes
 yesod-devel/
 cabal-dev
 .virthualenv
-
+tags
