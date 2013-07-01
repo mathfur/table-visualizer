@@ -11,8 +11,16 @@
     stroke-opacity: .6;
   }
 
+  div#input * {
+    float: left;
+  }
+
 <body>
-  <input type="text" id="node-filter"/>
+  <div id="input">
+    <input type="text" id="node-filter">
+    <button id="send">SEND
+    <button id="start">START
+    <button id="stop">STOP
   <script src="/static/static/js/d3.v3.min.js">
   ^{pageBody pc}
   <script src="/static/static/js/class_diagram.js">

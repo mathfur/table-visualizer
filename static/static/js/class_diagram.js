@@ -88,9 +88,9 @@ function update_force_layout(nodes_, links_){
 
 update_force_layout(graph.nodes, graph.links);
 
-d3.select("#node-filter")
-  .on("change", function(){
-    var pattern = new RegExp(d3.select(this).property("value"), 'i');
+d3.select("#send")
+  .on("click", function(){
+    var pattern = new RegExp(d3.select("#node-filter").property("value"), 'i');
     graph.nodes.forEach(function(d){
       d.disabled = !d.name.match(pattern);
     });
@@ -99,6 +99,16 @@ d3.select("#node-filter")
     });
     update_force_layout(graph.nodes, graph.links);
   });
+
+d3.select("#start")
+  .on("click", function(){
+    force.start();
+  })
+
+d3.select("#stop")
+  .on("click", function(){
+    force.stop();
+  })
 
 // helper functions
 function getOnlyUpperCase(str){
