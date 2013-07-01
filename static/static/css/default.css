@@ -1,0 +1,23 @@
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+div#input * {
+  float: left;
+}
+
+/* text: #B03631 */
+
+text {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+}
+
+body {
+  background-image: url(/static/static/img/background.jpg)
+}

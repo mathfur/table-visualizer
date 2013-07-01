@@ -10,11 +10,10 @@ var svg = d3.select("body").append("svg")
 var color = d3.scale.category20();
 
 var force = d3.layout.force()
-    .charge(-1000)
-    .linkDistance(400)
-    .gravity(.05)
-    .distance(200)
+    .charge(-3000)
+    .gravity(0.05)
     .friction(0.1)
+    .linkStrength(0.4)
     .size([width, height]);
 
 function update_force_layout(nodes_, links_){
@@ -52,12 +51,10 @@ function update_force_layout(nodes_, links_){
                                    .data([getOnlyUpperCase(d.name)])
                                    .enter()
                                    .append("text")
-                                   .attr("y", function(d, i){
-                                           return (text_padding + font_size) * (i+1);
-                                   })
+                                   .attr("y", font_size * 0.5)
                                    .attr("fill", "#000")
-                                   .attr("font-family", "impact")
                                    .attr("font-size", font_size)
+                                   .attr("text-anchor", "middle")
                                    .text(function(d){ return d });
 
                       var text_box_width  = d3.max(text[0].map(function(e){ return text_padding + e.getBBox().width; }));
@@ -69,7 +66,10 @@ function update_force_layout(nodes_, links_){
                         .attr("height", function(d){ return text_box_height })
                         .attr("rx", 3)
                         .attr("ry", 3)
-                        .style("fill", "#ccc")
+                        .style("fill", function(d){ return color(d.name) })
+                        .attr("x", (-1) * text_box_width * 0.5)
+                        .attr("y", (-1) * font_size * 0.5)
+                        .style("stroke-width", "0")
                         .call(force.drag);
                    });
 

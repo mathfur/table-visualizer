@@ -1,20 +1,7 @@
 \<!doctype html>
 <meta charset="utf-8">
+<link href="/static/static/css/default.css" rel="stylesheet" type="text/css">
 <style>
-  .node {
-    stroke: #fff;
-    stroke-width: 1.5px;
-  }
-
-  .link {
-    stroke: #999;
-    stroke-opacity: .6;
-  }
-
-  div#input * {
-    float: left;
-  }
-
 <body>
   <div id="input">
     <input type="text" id="node-filter">
