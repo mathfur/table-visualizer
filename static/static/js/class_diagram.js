@@ -49,7 +49,7 @@ function update_force_layout(nodes_, links_){
                    })
                    .each(function(d){
                       var text = d3.select(this).selectAll("text")
-                                   .data(getOnlyUpperCase(d.name))
+                                   .data([getOnlyUpperCase(d.name)])
                                    .enter()
                                    .append("text")
                                    .attr("y", function(d, i){
