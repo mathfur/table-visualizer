@@ -11,9 +11,9 @@ var color = d3.scale.category20();
 
 var force = d3.layout.force()
     .charge(-1000)
-    .linkDistance(120)
+    .linkDistance(400)
     .gravity(.05)
-    .distance(50)
+    .distance(200)
     .friction(0.1)
     .size([width, height]);
 
