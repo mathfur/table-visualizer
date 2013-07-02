@@ -33,18 +33,35 @@ function update_force_layout(nodes_, links_){
                    .attr("class", "group")
                    .on('mouseover', function(d){
                        var inner_text = [d.name, '>'].concat(d.columns.map(function(e){ return e.name + '::' + e.type }));
-                       svg.selectAll('text.tooltip')
-                         .data(inner_text)
-                         .enter()
-                         .append('text')
-                         .attr('class', 'tooltip')
-                         .attr('x', d.x)
-                         .attr('y', function(e, i){ return d.y + (i + 1) * 30 })
-                         .attr('fill', '#f00')
-                         .text(function(d){ return d });
+                       var tooltip = svg.select('.tooltip')
+                                        .append('g')
+                                        .attr('class', 'tooltip');
+
+                       var text = tooltip.selectAll('text')
+                                         .data(inner_text)
+                                         .append('text')
+                                         .attr('x', 0) // d.x)
+                                         .attr('y', 0) // function(e, i){ return d.y + (i + 1) * font_size })
+                                         .attr('fill', '#f00')
+                                         .text(function(e){ return d });
+
+                       var text_box_width  = d3.max(text[0].map(function(e){ return text_padding + e.getBBox().width; }));
+                       var text_box_height = d3.sum(text[0].map(function(e){ return text_padding + e.getBBox().height; }));
+
+                       tooltip.selectAll('text')
+                              .insert("rect", "text")
+                              .attr("width", function(d){  return text_box_width })
+                              .attr("height", function(d){ return text_box_height })
+                              .attr("rx", 3)
+                              .attr("ry", 3)
+                              .style("fill", "#ffa")
+                              .style("opacity", 0.1)
+                              .attr("x", 0)
+                              .attr("y", 0)
+                              .style("stroke-width", "0");
                    })
                    .on('mouseout', function(d){
-                      d3.selectAll('text.tooltip').remove();
+                      // d3.selectAll('.tooltip').remove();
                    })
                    .each(function(d){
                       var text = d3.select(this).selectAll("text")
@@ -86,7 +103,17 @@ function update_force_layout(nodes_, links_){
     });
 } // update_force_layout end
 
-update_force_layout(graph.nodes, graph.links);
+var start_node_index = graph.nodes.map(function(n){ return n.name }).indexOf("Organization");
+var tree_links = getTree(graph.links, d3.range(graph.nodes.length), start_node_index);
+
+console.log(["graph.nodes", graph.nodes]);
+console.log(["graph.links", graph.links]);
+console.log(["start_node_index", start_node_index]);
+
+console.log(["tree_links", tree_links]);
+console.log(["tree_links.slice(1, tree_links.length)", tree_links.slice(1, tree_links.length)]);
+
+update_force_layout(graph.nodes, tree_links.slice(1, tree_links.length));
 
 d3.select("#send")
   .on("click", function(){
@@ -110,7 +137,47 @@ d3.select("#stop")
     force.stop();
   })
 
-// helper functions
+// == helper functions =================================
 function getOnlyUpperCase(str){
   return str.split("").filter(function(e){ return e.toUpperCase() == e }).join("");
+}
+
+// console.log(getTree([["b", "a"], ["b", "c"]], ["a", "b", "c", "e"], "b")); //=> [["b", null], ["a", "b"], ["b", "c"]]
+// links :: [{source: Int, target: Int}]
+// vertex :: [Int]
+// v0 :: Int
+// 戻り値 :: [(Int, Maybe Int)]
+function getTree(links, vertex, v0){
+  var distance = {},
+      last_v = {},
+      result = [];
+      remainder = vertex;
+
+  vertex.forEach(function(v){
+    distance[v] = (v == v0) ? 0 : Infinity;
+    last_v[v] = -1;
+  });
+
+  while(remainder.length > 0){
+    u = remainder.sort(function(v){ return distance[v] })[0] // 最小となる点
+    result.push([u, last_v[u]])
+    remainder = remainder.filter(function(e){ return e != u });
+    neibor(remainder, links, u).forEach(function(v){
+      if (distance[v] > distance[u] + 1){
+        distance[v] = distance[u] + 1
+        last_v[v] = u  // betterな隣接点
+      }
+    })
+  }
+
+  return result.map(function(e){ return {source: e[0], target: e[1]} });
+}
+
+// nodes :: [Int]
+// links :: [{source: Int, target: Int}]
+// 戻り値 :: [Int]
+function neibor(nodes, links, p){
+  var arr = links.filter(function(e){ return (e.source == p || e.target == p) }).map(function(e){ return d3.values(e) });
+  var neibor = d3.set(d3.merge(arr)).values().map(function(e){ return +e }).filter(function(e){ return (0 <= nodes.map(function(e_){ return +e_ }).indexOf(e)) });
+  return neibor;
 }
